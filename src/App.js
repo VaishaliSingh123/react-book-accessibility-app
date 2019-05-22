@@ -12,14 +12,13 @@ class App extends React.Component{
     right: false,
     bookInformation:undefined,
     error:null,
-    isSearchEnabled:false,
-    searchValue:undefined
+    searchValue:undefined,
+    noValueFound:false
   };
   this.renderTableData=this.renderTableData.bind(this);
   this.handleChangeSearchInput=this.handleChangeSearchInput.bind(this);
   this.tableRenderingFunction=this.tableRenderingFunction.bind(this);
-  this.handleSearch=this.handleSearch.bind(this);
-  
+  this.rowRenderingFinction=this.rowRenderingFinction.bind(this);
 }
 
   componentDidMount() {
@@ -43,56 +42,58 @@ class App extends React.Component{
       [side]: open,
     });
   };
-  tableRenderingFunction(bookInformation){
-    if(bookInformation && bookInformation.length>0){
-    const {classes}=this.props;
-    return bookInformation.map((book,index)=>{
-      return (
-        <tr key={index}>
-           <td className={classes.tableColumnStyling}>{this.state.bookInformation[index].book_info.author}</td>
-           <td className={classes.tableColumnStyling}>{this.state.bookInformation[index].book_info.description}</td>
-           <td className={classes.tableColumnStyling}>{this.state.bookInformation[index].book_info.genre}</td>
-           <td className={classes.tableColumnStyling}>{this.state.bookInformation[index].book_info.name}</td>
-           <td className={classes.tableColumnStyling}>{this.state.bookInformation[index].book_info.publisher}</td>
-           <td className={classes.tableColumnStyling}>{this.state.bookInformation[index].is_available?"true":"false"}</td>
-           <td className={classes.tableColumnStyling}>{this.state.bookInformation[index].book_id}</td>
-        </tr>
-     )
-    })
-  }else return null;
-  };
+ 
   handleChangeSearchInput(event){   
     if(event){
       const searchString=event.currentTarget.value;
       if(searchString.length>0)
-      this.setState({isSearchEnabled:true, searchValue:searchString });
+      this.setState({searchValue:searchString });
       else
-      this.setState({isSearchEnabled:false, searchValue:'' });
-      this.handleSearch();  
+      this.setState({searchValue:'' });
 }
-}
-handleSearch(){
-  const {bookInformation, searchValue,isSearchEnabled}=this.state;
-  if(isSearchEnabled && searchValue.length>0){
-  for (var i = 0; i < bookInformation.length; i++) {
-    const str=bookInformation[i].book_info["name"];
+} 
+  renderTableData(){
+    const {bookInformation}=this.state;
+    if(bookInformation && bookInformation.length>0){
+      return bookInformation.map((book,index)=>{
+        return this.tableRenderingFunction(book,index);
+      });
+    }
+  }
+  tableRenderingFunction(book, index){
+    const {searchValue}=this.state;
+    if(book && searchValue && searchValue.length>0 ){
+      const str=book.book_info["name"];
     const lowerStr=str.toLowerCase();
     const lowerSearchString=searchValue.toLowerCase();
     if (lowerStr.includes(lowerSearchString) ) {
-        return this.tableRenderingFunction(bookInformation[i]);
+     return this.rowRenderingFinction(book,index);
       }
     }
-  }else return null;
-}
-  
-  renderTableData(){
-    if(this.state.bookInformation!==undefined){
-        return this.tableRenderingFunction(this.state.bookInformation);
-  }
+      else if(book){
+      return this.rowRenderingFinction(book,index);
+      }else {
+        this.setState({noValueFound:true});
+        return null;
+      }
   };
+  rowRenderingFinction(book,index){
+    const {classes}=this.props;
+    return (
+      <tr key={index}>
+         <td className={classes.tableColumnStyling}>{book.book_info.author}</td>
+         <td className={classes.tableColumnStyling}>{book.book_info.description}</td>
+         <td className={classes.tableColumnStyling}>{book.book_info.genre}</td>
+         <td className={classes.tableColumnStyling}>{book.book_info.name}</td>
+         <td className={classes.tableColumnStyling}>{book.book_info.publisher}</td>
+         <td className={classes.tableColumnStyling}>{book.is_available?"true":"false"}</td>
+         <td className={classes.tableColumnStyling}>{book.book_id}</td>
+      </tr>
+   )
+  }
+  
   render(){
     const { classes } = this.props;
-    const calledFun=this.state.isSearchEnabled?this.handleSearch():this.renderTableData();
   return (
     <div>
     <div className={classes.searchBarLayout}>
@@ -129,7 +130,7 @@ handleSearch(){
           <th>Book Id</th>
         </tr>
         <tbody>
-          {calledFun}
+        {this.renderTableData()}
         </tbody>
       </table>
 
