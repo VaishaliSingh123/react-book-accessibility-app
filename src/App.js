@@ -3,6 +3,11 @@ import { withStyles } from "@material-ui/core/styles";
 import SwipeableDrawer from '@material-ui/core/SwipeableDrawer';
 import Card from '@material-ui/core/Card';
 import Button from '@material-ui/core/Button';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
 import AppStyle from './AppStyle';
 
 class App extends React.Component{
@@ -80,15 +85,15 @@ class App extends React.Component{
   rowRenderingFinction(book,index){
     const {classes}=this.props;
     return (
-      <tr key={index}>
-         <td className={classes.tableColumnStyling}>{book.book_info.author}</td>
-         <td className={classes.tableColumnStyling}>{book.book_info.description}</td>
-         <td className={classes.tableColumnStyling}>{book.book_info.genre}</td>
-         <td className={classes.tableColumnStyling}>{book.book_info.name}</td>
-         <td className={classes.tableColumnStyling}>{book.book_info.publisher}</td>
-         <td className={classes.tableColumnStyling}>{book.is_available?"true":"false"}</td>
-         <td className={classes.tableColumnStyling}>{book.book_id}</td>
-      </tr>
+      <TableRow  key={index}>
+         <TableCell>{book.book_info.author}</TableCell >
+         <TableCell>{book.book_info.description}</TableCell >
+         <TableCell>{book.book_info.genre}</TableCell >
+         <TableCell>{book.book_info.name}</TableCell >
+         <TableCell>{book.book_info.publisher}</TableCell >
+         <TableCell>{book.is_available?"true":"false"}</TableCell >
+         <TableCell>{book.book_id}</TableCell >
+      </TableRow >
    )
   }
   
@@ -119,20 +124,22 @@ class App extends React.Component{
       </div>
       <div>
       <Card className={classes.card}>
-      <table className={classes.tableStyling}>
-        <tr>
-          <th>Author</th>
-          <th>Description</th>
-          <th>Genre</th>
-          <th>Name</th>
-          <th>Publisher</th>
-          <th>Available</th>
-          <th>Book Id</th>
-        </tr>
-        <tbody>
+      <Table className={classes.tableLayout}>
+      <TableHead>
+          <TableRow>
+          <TableCell>Author</TableCell>
+          <TableCell>Description</TableCell>
+          <TableCell>Genre</TableCell>
+          <TableCell>Name</TableCell>
+          <TableCell>Publisher</TableCell>
+          <TableCell>Available</TableCell>
+          <TableCell>Book Id</TableCell>
+          </TableRow>
+      </TableHead>   
+      <TableBody>
         {this.renderTableData()}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
 
       </Card>
         </div>

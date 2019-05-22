@@ -38,22 +38,8 @@ card:{
   margin:"5vh",
   overflow:"hidden"
 },
-tableStyling:{
-  margin:"2vh",
-  tableLayout:"fixed",
-  maxWidth:"45vh",
-  textAlign:"left",
-verticalAlign:"top",
-padding: "5px",
-wordWrap: "break-word"
-},
-tableColumnStyling:{
-  maxWidth:"45vh",
-  tableLayout:"fixed",
-textAlign:"left",
-verticalAlign:"top",
-padding: "5px",
-wordWrap: "break-word"
+tableLayout:{
+  tableLayout:"fixed"
 }
 });
 export default AppStyle;
