@@ -1,6 +1,5 @@
 import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
-import SwipeableDrawer from '@material-ui/core/SwipeableDrawer';
 import Card from '@material-ui/core/Card';
 import Button from '@material-ui/core/Button';
 import Table from '@material-ui/core/Table';
@@ -14,39 +13,23 @@ class App extends React.Component{
   constructor(props){
     super(props);
   this.state = {
-    right: false,
-    bookInformation:undefined,
+    isSorted: false,
+    gamesInformation:undefined,
     error:null,
-    searchValue:undefined,
-    noValueFound:false
+    searchValue:undefined
   };
   this.renderTableData=this.renderTableData.bind(this);
   this.handleChangeSearchInput=this.handleChangeSearchInput.bind(this);
   this.tableRenderingFunction=this.tableRenderingFunction.bind(this);
   this.rowRenderingFinction=this.rowRenderingFinction.bind(this);
+  this.handleSorting=this.handleSorting.bind(this);
 }
 
-  componentDidMount() {
-    fetch("https://c3e89f4f-0201-4f7c-b428-d61e98ff496f.mock.pstmn.io/getBooks")
-      .then(res => res.json())
-      .then(
-        (result) => {
-          this.setState({
-            bookInformation: result
-          });
-        },
-        (error) => {
-          this.setState({
-            error
-          });
-        }
-      )
-  }
-  toggleDrawer = (side, open) => () => {
-    this.setState({
-      [side]: open,
-    });
-  };
+componentDidMount(){
+  this.setState({gamesInformation:this.props.dataSet })
+}
+
+  
  
   handleChangeSearchInput(event){   
     if(event){
@@ -58,43 +41,59 @@ class App extends React.Component{
 }
 } 
   renderTableData(){
-    const {bookInformation}=this.state;
-    if(bookInformation && bookInformation.length>0){
-      return bookInformation.map((book,index)=>{
-        return this.tableRenderingFunction(book,index);
-      });
+    const {gamesInformation, isSorted}=this.state;
+    var sortedGameInfo;
+    if(gamesInformation && gamesInformation.length>0){
+     if(isSorted===true){
+         sortedGameInfo=gamesInformation.sort(function(a, b){
+          return (a.Year-b.Year);
+      })
+    }else if(isSorted===false){
+       sortedGameInfo=gamesInformation.sort(function(a, b){
+        return (a.Rank-b.Rank);
+    })
+  }
+        console.log("sorted data: ",sortedGameInfo);
+        return sortedGameInfo.map((game,index)=>{
+          return this.tableRenderingFunction(game,index);
+        });
+      
     }
   }
-  tableRenderingFunction(book, index){
+  tableRenderingFunction(game, index){
     const {searchValue}=this.state;
-    if(book && searchValue && searchValue.length>0 ){
-      const str=book.book_info["name"];
+    if(game && searchValue && searchValue.length>0 && game["Name"]!==undefined){
+      const str=game["Name"];
+      console.log("str:",str);
     const lowerStr=str.toLowerCase();
     const lowerSearchString=searchValue.toLowerCase();
     if (lowerStr.includes(lowerSearchString) ) {
-     return this.rowRenderingFinction(book,index);
+     return this.rowRenderingFinction(game,index);
       }
     }
-      else if(book){
-      return this.rowRenderingFinction(book,index);
-      }else {
-        this.setState({noValueFound:true});
-        return null;
+      else if(game){
+      return this.rowRenderingFinction(game,index);
       }
   };
-  rowRenderingFinction(book,index){
-    const {classes}=this.props;
+  rowRenderingFinction(game,index){
     return (
       <TableRow  key={index}>
-         <TableCell>{book.book_info.author}</TableCell >
-         <TableCell>{book.book_info.description}</TableCell >
-         <TableCell>{book.book_info.genre}</TableCell >
-         <TableCell>{book.book_info.name}</TableCell >
-         <TableCell>{book.book_info.publisher}</TableCell >
-         <TableCell>{book.is_available?"true":"false"}</TableCell >
-         <TableCell>{book.book_id}</TableCell >
+         <TableCell>{game.Rank}</TableCell >
+         <TableCell>{game.Genre}</TableCell >
+         <TableCell>{game.Global_Sales}</TableCell >
+         <TableCell>{game.Name}</TableCell >
+         <TableCell>{game.Platform}</TableCell >
+         <TableCell>{game.Publisher}</TableCell >
+         <TableCell>{game.Year}</TableCell >
       </TableRow >
    )
+  }
+
+  handleSorting(event){
+    if(event){
+      this.setState({isSorted:!this.state.isSorted});
+    }
+
   }
   
   render(){
@@ -109,17 +108,7 @@ class App extends React.Component{
       </form>
       </div>
       <div className={classes.filterBarWidth}>
-      <Button onClick={this.toggleDrawer('right', true)}>Click for filtering</Button>
-      <SwipeableDrawer
-          anchor="right"
-          open={this.state.right}
-          onClose={this.toggleDrawer('right', false)}
-          onOpen={this.toggleDrawer('right', true)}
-        >
-          
-           "value for right"
-         
-          </SwipeableDrawer>
+      <Button onClick={this.handleSorting}>Click for Sorting</Button>
       </div>
       </div>
       <div>
@@ -127,13 +116,13 @@ class App extends React.Component{
       <Table className={classes.tableLayout}>
       <TableHead>
           <TableRow>
-          <TableCell>Author</TableCell>
-          <TableCell>Description</TableCell>
+          <TableCell>Rank</TableCell>
           <TableCell>Genre</TableCell>
+          <TableCell>Global_Sales</TableCell>
           <TableCell>Name</TableCell>
+          <TableCell>Platform</TableCell>
           <TableCell>Publisher</TableCell>
-          <TableCell>Available</TableCell>
-          <TableCell>Book Id</TableCell>
+          <TableCell>Year</TableCell>
           </TableRow>
       </TableHead>   
       <TableBody>
